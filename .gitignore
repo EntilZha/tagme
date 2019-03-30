@@ -15,4 +15,7 @@ hs_err_pid*
 /config.xml
 /bin
 !/lib/snowball.jar
-
+repository/en
+wiki-2019*
+logs
+repository/tmp
