@@ -1,6 +1,11 @@
 TAGME V1.1 - HOW TO
 ===================
 
+This fork of tagme accomplishes two things beyond the original code:
+* Implements java/python code using py4j so that tagme can be called from python
+* Implements a web api wrapper around the python code
+* Adds a few instructions I found helpful in running the software
+
 Running Py4j Wrapper
 ====================
 
