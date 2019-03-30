@@ -1,0 +1,7 @@
+name: tagme
+dependencies:
+  - python=3.7
+  - pip:
+    - py4j
+    - fastapi==0.10.2
+    - uvicorn==0.6.1
