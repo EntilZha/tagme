@@ -33,50 +33,55 @@ for t in q_texts:
 results = gateway.entry_point.annotateMany(j_list)
 for i, mention in enumerate(results[:200]):
     annotations = mention.getAnnotations()
+    spans = [(s.getStart(), s.getEnd()) for s in mention.getSpans()]
     text = mention.getText()
-    print(q_texts[i])
+    o_text = q_texts[i]
+    print(o_text)
     print()
     print(text)
     annotations = [(
-        gateway.entry_point.idToPage(a.getTopic()), a.getStart(), a.getEnd(), a.getRho()
-    ) for a in annotations if a.getRho() > .1]
-    pprint.pprint(annotations)
-    for topic, start, end, _ in annotations:
-        print(topic, '---', text[start:end])
+        gateway.entry_point.idToPage(a.getTopic()),
+        a.getStart(), a.getEnd(),
+        a.getRho()
+    ) for a in annotations]
+    for (o_start, o_end), (topic, start, end, rho)  in zip(spans, annotations):
+        if rho > .1:
+            print(topic, '---', text[start:end])
+            print(topic, '---', o_text[o_start:o_end])
     print()
 ```
-**Very important**: Tagme does its own preprocessing so if you use start/end indices they will not necessarily align with the original text.
+**Very important**: Tagme does its own preprocessing so if you use start/end indices they will not necessarily align with the original text. This is fixable by fetching the original indices in addition to the post-processed ones.
 Which prints:
 ```
 After this character relates a story about how he didn't know the proper way to use a wheelbarrow, he tells of how a captain dining with his father mistakenly rubbed his hands in a punch bowl. This "sea Prince of Wales" leaves his home by hiding out in a canoe near a coral reef, and he is mistakenly called "Hedgehog" by a character who offers him a ninetieth lay, a partner of Bildad named Peleg. A door is broken down in Mrs. Hussey's establishment after he locks himself in his room during a "Ramadan." He is first encountered in the Spouter-Inn where the landlord thinks he may be late because "he can't sell his head," and his coffin helps save the narrator after the ship he's on sinks. For 10 points, name this native of Rokovoko and savage companion of Ishmael in Moby-Dick.
 
 after this character relates a story about how he didn t know the proper way to use a wheelbarrow he tells of how a captain dining with his father mistakenly rubbed his hands in a punch bowl this sea prince of wales leaves his home by hiding out in a canoe near a coral reef and he is mistakenly called hedgehog by a character who offers him a ninetieth lay a partner of bildad named peleg a door is broken down in mrs hussey s establishment after he locks himself in his room during a ramadan he is first encountered in the spouterinn where the landlord thinks he may be late because he can t sell his head and his coffin helps save the narrator after the ship he s on sinks for 10 points name this native of rokovoko and savage companion of ishmael in mobydick
-[('Wheelbarrow', 86, 97, 0.17079073),
- ('Punch bowl', 180, 190, 0.12726443),
- ('Charles, Prince of Wales', 200, 215, 0.16478936),
- ('Wales', 210, 215, 0.14875177),
- ('Canoe', 251, 256, 0.13062796),
- ('Coral reef', 264, 274, 0.52958),
- ('Hedgehog', 303, 311, 0.2560342),
- ('Bildad', 371, 377, 0.14244898),
- ('Ramadan', 486, 493, 0.33239952),
- ('Landlord', 546, 554, 0.11933316),
- ('Rokovoko', 710, 718, 0.52454484),
- ('Ishmael (Moby-Dick)', 743, 750, 0.20457493),
- ('Moby-Dick', 754, 762, 0.31165764)]
+Wheelbarrow --- wheelbarrow
 Wheelbarrow --- wheelbarrow
 Punch bowl --- punch bowl
+Punch bowl --- punch bowl
 Charles, Prince of Wales --- prince of wales
+Charles, Prince of Wales --- Prince of Wales
 Wales --- wales
+Wales --- Wales
+Canoe --- canoe
 Canoe --- canoe
 Coral reef --- coral reef
+Coral reef --- coral reef
 Hedgehog --- hedgehog
+Hedgehog --- Hedgehog
 Bildad --- bildad
+Bildad --- Bildad
 Ramadan --- ramadan
+Ramadan --- Ramadan
+Landlord --- landlord
 Landlord --- landlord
 Rokovoko --- rokovoko
+Rokovoko --- Rokovoko
 Ishmael (Moby-Dick) --- ishmael
+Ishmael (Moby-Dick) --- Ishmael
 Moby-Dick --- mobydick
+Moby-Dick --- Moby-Dick
 ```
 
 Original Readme below
