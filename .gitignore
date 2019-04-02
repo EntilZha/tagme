@@ -19,3 +19,4 @@ repository/en
 wiki-2019*
 logs
 repository/tmp
+__pycache__

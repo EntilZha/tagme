@@ -1,24 +1,26 @@
-TAGME V1.1 - HOW TO
-===================
+# TAGME V1.1 - HOW TO
 
 This fork of tagme accomplishes two things beyond the original code:
 * Implements java/python code using py4j so that tagme can be called from python
 * Implements a web api wrapper around the python code
 * Adds a few instructions I found helpful in running the software
 
-Running Py4j Wrapper
-====================
+## Running Py4j Wrapper
 
-Install Py4j: https://www.py4j.org/install.html
+1. Install Py4j: https://www.py4j.org/install.html
+2. Py4j works by having you run a java program (TagmeEntryPoint.java) that imports the code you would like to run, and then makes itself available to by called from python.
+3. Thus you should compile and run the entry point code with commands like below
+4. Then you can run the python code block to call the java code directly, or use the web api wrapper described lower down.
 
+### Java Side
 ```bash
 javac -cp lib/*:ext_lib/*:bin/:/usr/share/py4j/py4j0.10.6.jar samples/TagmeEntryPoint.java
 java -cp lib/*:ext_lib/*:bin/:/usr/share/py4j/py4j0.10.6.jar:samples/ -Xmx30G -Dtagme.config=./config.xml TagmeEntryPoint
 ```
 
-This will compile the java wrapper around tagme and then run a JVM which python will access. In a new terminal window with the above java command running in the background you can try code like below. For clarity the type of `q_texts` in python is `List[str]`.
-
+### Python Side
 ```python
+from typing import List
 from py4j.java_gateway import JavaGateway
 import json
 import pprint
@@ -26,7 +28,7 @@ import pprint
 gateway = JavaGateway()
 with open('qanta.train.2018.04.18.json') as f:
     questions = json.load(f)['questions']
-q_texts = [q['text'] for q in questions]
+q_texts: List[str] = [q['text'] for q in questions]
 j_list = gateway.jvm.java.util.ArrayList()
 for t in q_texts:
     j_list.append(t)
@@ -50,7 +52,9 @@ for i, mention in enumerate(results[:200]):
             print(topic, '---', o_text[o_start:o_end])
     print()
 ```
-**Very important**: Tagme does its own preprocessing so if you use start/end indices they will not necessarily align with the original text. This is fixable by fetching the original indices in addition to the post-processed ones.
+
+**Very important**: Tagme does its own preprocessing so if you use start/end indices they will not necessarily align with the original text.
+This is fixable by fetching the original indices in addition to the post-processed ones.
 Which prints:
 ```
 After this character relates a story about how he didn't know the proper way to use a wheelbarrow, he tells of how a captain dining with his father mistakenly rubbed his hands in a punch bowl. This "sea Prince of Wales" leaves his home by hiding out in a canoe near a coral reef, and he is mistakenly called "Hedgehog" by a character who offers him a ninetieth lay, a partner of Bildad named Peleg. A door is broken down in Mrs. Hussey's establishment after he locks himself in his room during a "Ramadan." He is first encountered in the Spouter-Inn where the landlord thinks he may be late because "he can't sell his head," and his coffin helps save the narrator after the ship he's on sinks. For 10 points, name this native of Rokovoko and savage companion of Ishmael in Moby-Dick.
@@ -83,6 +87,16 @@ Ishmael (Moby-Dick) --- Ishmael
 Moby-Dick --- mobydick
 Moby-Dick --- Moby-Dick
 ```
+
+### Web API
+
+To run the web api install the dependencies in `environment.yml`.
+This is easily done with anaconda python by running `conda env create -f environment.yml` then activating with `source activate tagme` or `conda activate tagme` depending on shell.
+
+Next you can run:
+1. Run the web api `uvicorn tagme:app`
+2. Navigate to http://localhost:8000/docs to check the docs for how to call/test the api
+
 
 Original Readme below
 
